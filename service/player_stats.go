@@ -4,7 +4,7 @@ import (
 	"gin/models"
 )
 
-func GetPlayerStats() ([]*models.PlayerStats, error) {
+func Get() ([]*models.PlayerStats, error) {
 	var stats []*models.PlayerStats
 	//fill stats with data
 	stats = append(stats, &models.PlayerStats{
