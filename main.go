@@ -21,6 +21,7 @@ func main() {
 	router.POST("/player-stats", routes.Add)
 	router.GET("/player-stats/:id", routes.Get)
 	router.GET("/player-stats", routes.GetAll)
+	router.PUT("/player-stats/:id", routes.Update)
 
 	router.Run("localhost:8080")
 }
