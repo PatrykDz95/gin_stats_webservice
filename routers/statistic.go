@@ -19,8 +19,8 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-func InsertPlayerStats(c *gin.Context) {
-	playerStats := &models.PlayerStats{}
+func Add(c *gin.Context) {
+	playerStats := models.PlayerStats{}
 	if err := c.ShouldBindJSON(playerStats); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -29,4 +29,18 @@ func InsertPlayerStats(c *gin.Context) {
 	created := database.DB.Create(playerStats)
 
 	c.JSON(http.StatusCreated, gin.H{"player": created.Statement.Model})
+}
+
+func GetAll(c *gin.Context) {
+	var playerStats []*models.PlayerStats
+	found := database.DB.Find(&playerStats)
+
+	c.JSON(http.StatusCreated, gin.H{"players": found.Statement.Model})
+}
+
+func Get(c *gin.Context) {
+	playerStats := models.PlayerStats{}
+	found := database.DB.First(&playerStats, c.Param("id"))
+
+	c.JSON(http.StatusCreated, gin.H{"players": found.Statement.Model})
 }

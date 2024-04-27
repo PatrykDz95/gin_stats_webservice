@@ -18,7 +18,9 @@ func main() {
 		c.JSON(http.StatusOK, stats)
 	})
 	routes.SetupRouter()
-	router.POST("/player-stats", routes.InsertPlayerStats)
+	router.POST("/player-stats", routes.Add)
+	router.GET("/player-stats/:id", routes.Get)
+	router.GET("/player-stats", routes.GetAll)
 
 	router.Run("localhost:8080")
 }
