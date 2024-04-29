@@ -16,5 +16,5 @@ type PlayerStats struct {
 	Blocks    int    `json:"blocks"`
 	Turnovers int    `json:"turnovers"`
 	Minutes   int    `json:"minutes"`
-	CreatedOn int    `json:"created_on"`
+	CreatedOn string `json:"created_on"`
 }

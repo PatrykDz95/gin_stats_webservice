@@ -22,6 +22,7 @@ func main() {
 	router.GET("/player-stats/:id", routes.Get)
 	router.GET("/player-stats", routes.GetAll)
 	router.PUT("/player-stats/:id", routes.Update)
+	router.DELETE("/player-stats/:id", routes.Delete)
 
 	router.Run("localhost:8080")
 }
