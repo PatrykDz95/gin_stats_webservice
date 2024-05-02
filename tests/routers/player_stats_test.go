@@ -170,3 +170,33 @@ func TestUpdate_ReturnsOK_WhenPlayerStatsUpdatedSuccessfully(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.Code)
 }
+
+func TestDelete_ReturnsNotFound_WhenPlayerStatsDoesNotExist(t *testing.T) {
+	router := gin.Default()
+	router.DELETE("/playerStats/:id", routes.Delete)
+
+	req, _ := http.NewRequest("DELETE", "/playerStats/999", nil)
+	resp := httptest.NewRecorder()
+
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusNotFound, resp.Code)
+}
+
+func TestDelete_ReturnsOK_WhenPlayerStatsDeletedSuccessfully(t *testing.T) {
+	router := gin.Default()
+	router.DELETE("/playerStats/:id", routes.Delete)
+
+	// Create a player stats record for testing
+	playerStats := entities.PlayerStats{Name: "John", Surname: "Doe", Age: 30, Position: "Forward"}
+	result := database.DB.Create(&playerStats)
+	if result.Error != nil {
+		t.Fatalf("Failed to create player stats for testing: %v", result.Error)
+	}
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/playerStats/%d", playerStats.ID), nil)
+	resp := httptest.NewRecorder()
+
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+}

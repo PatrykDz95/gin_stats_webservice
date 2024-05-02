@@ -89,15 +89,18 @@ func Update(c *gin.Context) {
 }
 
 func Delete(c *gin.Context) {
-	playerStats := entities.PlayerStats{}
-	if err := c.ShouldBindJSON(&playerStats); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"errorMessage": err.Error()})
+	id := c.Param("id")
+	var playerStats entities.PlayerStats
+	result := database.DB.First(&playerStats, id)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"errorMessage": result.Error.Error()})
 		return
 	}
-	deleted := database.DB.Delete(&playerStats, c.Param("id"))
+	deleted := database.DB.Delete(&playerStats, id)
 	if deleted.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"errorMessage": deleted.Error.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"player": deleted.Statement.Model})
+
 }
