@@ -1,4 +1,4 @@
-package models
+package middleware
 
 import (
 	"crypto/rand"
@@ -18,6 +18,8 @@ type User struct {
 	Password string
 	Email    string
 	Salt     string
+	Verified bool
+	Token    string
 }
 
 func ChangePasswordHandler(c *gin.Context) {

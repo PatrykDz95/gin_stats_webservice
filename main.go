@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gin/models"
-	routes "gin/routers"
+	"gin/middleware"
+	"gin/routers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,17 +10,20 @@ func main() {
 	router := gin.Default()
 	routes.SetupRouter()
 
-	router.POST("/player-stats", models.AuthMiddleware(), routes.Add)
-	router.GET("/player-stats/:id", models.AuthMiddleware(), routes.GetById)
-	router.GET("/player-stats/player/:name/:surname", models.AuthMiddleware(), routes.GetByNameAndSurname)
-	router.GET("/player-stats", models.AuthMiddleware(), routes.GetAll)
-	router.PUT("/player-stats/:id", models.AuthMiddleware(), routes.Update)
-	router.DELETE("/player-stats/:id", models.AuthMiddleware(), routes.Delete)
+	router.Use(middleware.RateLimitMiddleware(50, 1*60*60*1000000000)) // 50 requests per hour
+
+	// Player stats routes
+	router.POST("/player-stats", middleware.AuthMiddleware(), routes.Add)
+	router.GET("/player-stats/:id", middleware.AuthMiddleware(), routes.GetById)
+	router.GET("/player-stats/player/:name/:surname", middleware.AuthMiddleware(), routes.GetByNameAndSurname)
+	router.GET("/player-stats", middleware.AuthMiddleware(), routes.GetAll)
+	router.PUT("/player-stats/:id", middleware.AuthMiddleware(), routes.Update)
+	router.DELETE("/player-stats/:id", middleware.AuthMiddleware(), routes.Delete)
 
 	// Register routes
-	router.POST("/register", models.RegisterHandler)
-	router.POST("/login", models.LoginHandler)
-	router.POST("/change-password", models.AuthMiddleware(), models.ChangePasswordHandler)
+	router.POST("/register", middleware.RegisterHandler)
+	router.POST("/login", middleware.LoginHandler)
+	router.POST("/change-password", middleware.AuthMiddleware(), middleware.ChangePasswordHandler)
 
 	router.Run("localhost:8080")
 }
