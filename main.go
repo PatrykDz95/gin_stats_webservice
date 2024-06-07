@@ -14,6 +14,7 @@ func main() {
 
 	// Player stats routes
 	router.POST("/player-stats", middleware.AuthMiddleware(), routes.Add)
+	router.POST("/batch-insert", routes.BatchInsertCsvData)
 	router.GET("/player-stats/:id", middleware.AuthMiddleware(), routes.GetById)
 	router.GET("/player-stats/player/:name/:surname", middleware.AuthMiddleware(), routes.GetByNameAndSurname)
 	router.GET("/player-stats", middleware.AuthMiddleware(), routes.GetAll)
@@ -25,5 +26,8 @@ func main() {
 	router.POST("/login", middleware.LoginHandler)
 	router.POST("/change-password", middleware.AuthMiddleware(), middleware.ChangePasswordHandler)
 
-	router.Run("localhost:8080")
+	err := router.Run("localhost:8080")
+	if err != nil {
+		return
+	}
 }
