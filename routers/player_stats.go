@@ -1,14 +1,20 @@
 package routes
 
 import (
+	"gin/csv"
 	"gin/database"
 	"gin/entities"
 	"github.com/gin-gonic/gin"
+	"github.com/muesli/cache2go"
 	"net/http"
 	"time"
 )
 
+var cache *cache2go.CacheTable
+
 func SetupRouter() *gin.Engine {
+	cache = cache2go.Cache("playerStatsCache")
+
 	router := gin.Default()
 
 	// Initialize database connection
@@ -47,12 +53,21 @@ func GetAll(c *gin.Context) {
 }
 
 func GetById(c *gin.Context) {
+	playerId := c.Param("id")
+	cacheValue, err := cache.Value(playerId)
+	if err == nil {
+		c.JSON(http.StatusOK, gin.H{"player": cacheValue.Data()})
+		return
+	}
+
 	playerStats := entities.PlayerStats{}
-	found := database.DB.First(&playerStats, c.Param("id"))
+	found := database.DB.First(&playerStats, playerId)
 	if found.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"errorMessage": found.Error.Error()})
 		return
 	}
+	cache.Add(playerId, 5*time.Hour, found.Statement.Model)
+
 	c.JSON(http.StatusOK, gin.H{"player": found.Statement.Model})
 }
 
@@ -102,5 +117,8 @@ func Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"player": deleted.Statement.Model})
+}
 
+func BatchInsertCsvData(c *gin.Context) {
+	csv.WriteCsvIntoDB()
 }
